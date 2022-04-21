@@ -67,12 +67,18 @@ var requestHandler = function(request, response) {
     response.end(JSON.stringify(dataObj));
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
     response.writeHead(201, headers);
-    dataObj.results.push(request.data);
-    // dataObj.results.push(JSON.parse(request.data));
-    response.end(JSON.stringify(dataObj));
+    var body = '';
+    request.on('data', (data) => {
+      body += data;
+    });
+    request.on('end', () => {
+      var dataPiece = JSON.parse(body);
+      dataObj.results.push(dataPiece);
+      response.end(JSON.stringify(dataObj));
+    });
   } else {
     response.writeHead(404, headers);
-    response.end();
+    response.end('404 Page not found!');
   }
 
   // .writeHead() writes to the request line and headers of the response,
