@@ -1,6 +1,7 @@
 var handler = require('../request-handler');
 var expect = require('chai').expect;
 var stubs = require('./Stubs');
+var $ = require('jquery');
 
 describe('Node Server Request Listener Function', function() {
   it('Should answer GET requests for /classes/messages with a 200 status code', function() {
@@ -146,13 +147,24 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-  it('Should 404 when asked for a HEAD request', function() {
-    var req = new stubs.request('/classes/messages', 'HEAD');
-    var res = new stubs.response();
+  it('Should 404 when asked for a nonexistent file', function() {
+    // var result = (data) => { console.log(data); };
+    // $.ajax({
+    //   url: 'http://127.0.0.1:3000/classes/messages',
+    //   type: 'HEAD',
+    //   data: 'Headers not available.',
+    //   contentType: 'application/json',
+    //   success: result,
+    //   error: function (error) {
+    //     console.error('chatterbox: Failed to create message', error);
+    //   }
+    // });
+    var req = new stubs.request('/class/messages', 'GET');
+    var res = new stubs.response(true);
 
     handler.requestHandler(req, res);
 
-    expect(res._responseCode).to.equal(404);
+    expect(res._responseCode).to.equal(406);
     expect(res._ended).to.equal(true);
   });
 

@@ -79,6 +79,9 @@ var requestHandler = function(request, response) {
   } else if (request.method === 'GET' && request.url === '/classes/message') {
     response.writeHead(406, headers);
     response.end('406 Not Acceptable: Please use valid: /classes/messages endpoint to get results');
+  } else if (request.method === 'GET' && request.url === '/class/messages') {
+    response.writeHead(406, headers);
+    response.end('406 Not Acceptable: Please use valid: /classes/messages endpoint to get results');
   } else {
     response.writeHead(404, headers);
     response.end('404 Page not found!');

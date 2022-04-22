@@ -68,12 +68,48 @@ describe('server', function() {
     });
   });
 
+  it('should respond with messages that were previously posted', function(done) {
+    var requestParams = {method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: 'Bobo',
+        text: 'Do Bobo\'s bidding!'}
+    };
+
+    request(requestParams, function(error, response, body) {
+      // Now if we request the log, that message we posted should be there:
+      request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+        var messages = JSON.parse(body).results;
+        expect(messages[2].username).to.equal('Bobo');
+        expect(messages[2].text).to.equal('Do Bobo\'s bidding!');
+        done();
+      });
+    });
+  });
+
+  it('should respond with messages that were previously posted', function(done) {
+    var requestParams = {method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: 'Baby',
+        text: 'Wahh!',
+        loudness: 'Loud'}
+    };
+
+    request(requestParams, function(error, response, body) {
+      // Now if we request the log, that message we posted should be there:
+      request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+        var messages = JSON.parse(body).results;
+        expect(messages[3].loudness).to.equal('Loud');
+        done();
+      });
+    });
+  });
+
   it('Should 404 when asked for a nonexistent endpoint', function(done) {
     request('http://127.0.0.1:3000/arglebargle', function(error, response, body) {
       expect(response.statusCode).to.equal(404);
       done();
     });
   });
-
-
 });
