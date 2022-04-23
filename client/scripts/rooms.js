@@ -42,5 +42,5 @@ var Rooms = {
       callback(Rooms.items());
     }
   }
-  
+
 };

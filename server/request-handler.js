@@ -1,3 +1,4 @@
+
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -25,15 +26,18 @@ this file and include it in basic-server.js so that it actually works.
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
+  // 'access-control-allow-headers': 'content-type, accept',
+  'access-control-allow-headers': 'Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization',
   'access-control-max-age': 10 // Seconds.
 };
 
 //dataObj for storing responses?
 var dataObj = {results: []};
-
+var fs = require('fs');
 
 var requestHandler = function(request, response) {
+  var path = '/client/scripts/'
+  var fileNames = ['parse.js', 'rooms.js', 'friends.js', 'messages.js', 'formView.js', 'roomsView.js', 'messageView.js', 'messagesView.js', 'app.js' ];
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -61,8 +65,58 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = 'application/json';
-
-  if (request.method === 'GET' && request.url === '/classes/messages') {
+  //http://127.0.0.1:3000
+  if (request.url === '/' || request.url.includes('?username=')) {
+    fs.readFile('./chatterbox.html', 'utf8', (err, data) => {
+      if (err) {
+        throw error;
+      } else {
+        headers['Content-Type'] = 'text/html';
+        response.writeHead(statusCode, headers);
+        response.end(data);
+      }
+    });
+  } else if (request.url.includes(path)) {
+    for (var i = 0; i < fileNames.length; i++) {
+      if (request.url === path + fileNames[i]) {
+        fs.readFile('.' + path + fileNames[i], 'utf8', (err, jsFile) => {
+          if (err) {
+            throw error;
+          } else {
+            headers['Content-Type'] = 'text/javascript';
+            response.writeHead(statusCode, headers);
+            response.write(jsFile);
+            response.end();
+          }
+        });
+      }
+    }
+    // <link rel="stylesheet" href="client/styles/styles.css">
+    // <script src="node_modules/jquery/dist/jquery.js"></script>
+    // <script src="node_modules/underscore/underscore.js"></script>
+  } else if (request.url.includes('/node_modules/jquery')) {
+    fs.readFile('./node_modules/jquery/dist/jquery.js', 'utf8', (err, jsFile) => {
+      if (err) {
+        throw error;
+      } else {
+        headers['Content-Type'] = 'text/javascript';
+        response.writeHead(statusCode, headers);
+        response.write(jsFile);
+        response.end();
+      }
+    });
+  } else if (request.url.includes('/node_modules/underscore')) {
+    fs.readFile('./node_modules/underscore/underscore.js', 'utf8', (err, jsFile) => {
+      if (err) {
+        throw error;
+      } else {
+        headers['Content-Type'] = 'text/javascript';
+        response.writeHead(statusCode, headers);
+        response.write(jsFile);
+        response.end();
+      }
+    });
+  } else if (request.method === 'GET' && request.url === '/classes/messages') {
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(dataObj));
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
@@ -72,10 +126,14 @@ var requestHandler = function(request, response) {
       body += data;
     });
     request.on('end', () => {
-      var dataPiece = JSON.parse(body);
-      dataObj.results.push(dataPiece);
+      var message = JSON.parse(body);
+      dataObj.results.push(message);
+      message['message_id'] = dataObj.results.length;
       response.end(JSON.stringify(dataObj));
     });
+  } else if (request.method === 'OPTIONS' && request.url === '/classes/messages') {
+    response.writeHead(200, headers);
+    response.end();
   } else if (request.method === 'GET' && request.url === '/classes/message') {
     response.writeHead(406, headers);
     response.end('406 Not Acceptable: Please use valid: /classes/messages endpoint to get results');
@@ -86,6 +144,8 @@ var requestHandler = function(request, response) {
     response.writeHead(404, headers);
     response.end('404 Page not found!');
   }
+
+
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.

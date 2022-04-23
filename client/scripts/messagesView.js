@@ -8,7 +8,7 @@ var MessagesView = {
   initialize: function() {
 
     MessagesView.$chats.on('click', '.username', MessagesView.handleClick);
-      },
+  },
 
   render: function() {
 
@@ -17,13 +17,13 @@ var MessagesView = {
       .items()
       .filter(message => Rooms.isSelected(message.roomname))
       .each(message => MessagesView.renderMessage(message));
-      },
+  },
 
   renderMessage: function(message) {
 
     var $message = MessageView.render(message);
     MessagesView.$chats.prepend($message);
-      },
+  },
 
   handleClick: function(event) {
 
@@ -32,6 +32,6 @@ var MessagesView = {
     if (username === undefined) { return; }
 
     Friends.toggleStatus(username, MessagesView.render);
-      }
+  }
 
 };
