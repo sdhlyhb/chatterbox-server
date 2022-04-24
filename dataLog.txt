@@ -1,0 +1,1 @@
+{"results":[{"username":"anonymous","text":"test","roomname":"lobby","message_id":1},{"username":"serena","text":"test for save message logs","roomname":"lobby","message_id":2}]}

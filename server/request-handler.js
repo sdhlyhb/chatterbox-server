@@ -116,7 +116,20 @@ var requestHandler = function(request, response) {
         response.end();
       }
     });
-  } else if (request.method === 'GET' && request.url === '/classes/messages') {
+  } else if (request.url.includes('/client/styles')) {
+    fs.readFile('./client/styles/styles.css', 'utf8', (err, cssFile) => {
+      if (err) {
+        throw error;
+      } else {
+        headers['Content-Type'] = 'text/css';
+        response.writeHead(statusCode, headers);
+        response.write(cssFile);
+        response.end();
+      }
+    });
+  }
+
+  else if (request.method === 'GET' && request.url === '/classes/messages') {
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(dataObj));
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
@@ -129,7 +142,15 @@ var requestHandler = function(request, response) {
       var message = JSON.parse(body);
       dataObj.results.push(message);
       message['message_id'] = dataObj.results.length;
+      fs.writeFile('dataLog.txt', JSON.stringify(dataObj), (err) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        console.log('data is written to file successfully!');
+      });
       response.end(JSON.stringify(dataObj));
+
     });
   } else if (request.method === 'OPTIONS' && request.url === '/classes/messages') {
     response.writeHead(200, headers);
